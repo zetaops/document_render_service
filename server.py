@@ -123,7 +123,7 @@ class GenerateDocument(object):
         if template.startswith("http"):
             t_file = self.download_template(template)
         else:
-            t_file = BytesIO(base64.decodebytes(template))
+            t_file = BytesIO(base64.b64decode(template))
 
         context = req.context.get('template', None)
         download_url = self.render_document(t_file=t_file, context=context)
@@ -159,6 +159,7 @@ class GenerateDocument(object):
             (str) downloaded file
 
         """
+
         engine = Renderer()
         rendered = engine.render(t_file, **context)
         return "%s%s" % (S3_PUBLIC_URL, self.save_document(rendered))

@@ -20,7 +20,7 @@ docker run \
 ## Usage
 Request:
 ```bash
-curl localhost:3002 -d '{"template_url": "http://example.com/sample_template.odt", "context_data": {"name": "ali"}}'
+curl localhost:3002/v1 -X POST -d '{"template_url": "http://example.com/sample_template.odt", "context_data": {"name": "ali"}}'
 
 ```
 
@@ -28,3 +28,8 @@ Response:
 ```json
 {"download_url": "http://example.com/sample_rendered.odt"}
 ```
+
+## Libraries used
+- secretary (https://github.com/christopher-ramirez/secretary)
+- falcon
+- boto
