@@ -120,9 +120,10 @@ class GenerateDocument(object):
         if template.startswith("http"):
             t_file = self.download_template(template)
         else:
-            t_file = BytesIO(base64.b64decode(template))
+            t_file = base64.b64decode(template)
+        t_file = BytesIO(t_file)
 
-        context = req.context['body'].get('context', None)
+        context = req.context['body'].get('context', {})
         download_url = self.render_document(t_file=t_file, context=context)
 
         resp.status = falcon.HTTP_200
@@ -152,9 +153,8 @@ class GenerateDocument(object):
         Returns:
             (str) downloaded file
         """
-        odt_template = BytesIO(t_file)
         engine = Renderer()
-        rendered = engine.render(odt_template, **context)
+        rendered = engine.render(t_file, **context)
         return "%s%s" % (S3_PUBLIC_URL, self.save_document(rendered))
 
     @staticmethod
@@ -175,9 +175,7 @@ app = falcon.API(middleware=[
     JSONTranslator(),
 ])
 
-generator = GenerateDocument()
-
-app.add_route('/v1', generator)
+app.add_route('/v1', GenerateDocument())
 
 # Useful for debugging problems in your API; works with pdb.set_trace(). You
 # can also use Gunicorn to host your app. Gunicorn can be configured to
@@ -185,4 +183,4 @@ app.add_route('/v1', generator)
 # with pdb.
 if __name__ == '__main__':
     httpd = simple_server.make_server('127.0.0.1', 3002, app)
-httpd.serve_forever()
+    httpd.serve_forever()
