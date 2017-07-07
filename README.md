@@ -14,14 +14,14 @@ docker run \
     -e S3_BUCKET_NAME="my_bucket" \
     -e MAX_UPLOAD_TEMPLATE_SIZE=2097152 \
     -p 3002 \
-    zetaops/document_render_service 
+    zetaops/document_render_service
 ```
 
 ## Usage
 Request:
 ```bash
-curl localhost:3002/v1 -X POST -d '{"template_url": "http://example.com/sample_template.odt", "context_data": {"name": "ali"}}'
-
+curl localhost:3002/v1 -X POST -i -H "Content-Type: application/json" -d '{"template": "http://example.com/sample_template.odt", "context": {"name": "ali"}}'
+curl localhost:3002/v1 -X POST -i -H "Content-Type: application/json" -d "{\"template\": \"`base64 -w 0 template.odt`\", \"context\": {\"name\": \"ali\"}}"
 ```
 
 Response:
