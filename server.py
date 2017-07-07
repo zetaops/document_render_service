@@ -8,9 +8,6 @@
 This simple web service renders Open Document Format
 templates with given context data and generates ODF
 documents, uploads them any S3 compatible service.
-
-
-
 """
 
 import falcon
@@ -100,8 +97,8 @@ class GenerateDocument(object):
     Request Handler, expects
     """
 
-    def __init__(self, db):
-        self.db = db
+    def __init__(self):
+
         self.logger = logging.getLogger('rengendoc.' + __name__)
         conn = s3(aws_access_key_id=S3_ACCESS_KEY,
                   aws_secret_access_key=S3_SECRET_KEY,
@@ -123,9 +120,10 @@ class GenerateDocument(object):
         if template.startswith("http"):
             t_file = self.download_template(template)
         else:
-            t_file = BytesIO(base64.b64decode(template))
+            t_file = base64.b64decode(template)
+        t_file = BytesIO(t_file)
 
-        context = req.context.get('template', None)
+        context = req.context['body'].get('context', {})
         download_url = self.render_document(t_file=t_file, context=context)
 
         resp.status = falcon.HTTP_200
@@ -138,10 +136,8 @@ class GenerateDocument(object):
         Save document to S3 bucket
         Args:
             rendered: file
-
         Returns:
             (str) key of file
-
         """
         k = Key(self.bucket)
         k.set_contents_from_string(rendered)
@@ -154,12 +150,9 @@ class GenerateDocument(object):
         Args:
             t_file: template file
             context: (dict) template variables
-
         Returns:
             (str) downloaded file
-
         """
-
         engine = Renderer()
         rendered = engine.render(t_file, **context)
         return "%s%s" % (S3_PUBLIC_URL, self.save_document(rendered))
@@ -167,13 +160,10 @@ class GenerateDocument(object):
     @staticmethod
     def download_template(template_url):
         """
-
         Args:
             template_url: (string) url of template file
-
         Returns:
             return downloaded file
-
         """
         response = urllib.request.urlopen(template_url)
         return response.read()
@@ -185,7 +175,7 @@ app = falcon.API(middleware=[
     JSONTranslator(),
 ])
 
-app.add_route('/v1', GenerateDocument)
+app.add_route('/v1', GenerateDocument())
 
 # Useful for debugging problems in your API; works with pdb.set_trace(). You
 # can also use Gunicorn to host your app. Gunicorn can be configured to
