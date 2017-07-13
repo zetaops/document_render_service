@@ -155,7 +155,8 @@ class GenerateDocument(object):
         """
         engine = Renderer()
         rendered = engine.render(t_file, **context)
-        return "%s%s" % (S3_PUBLIC_URL, self.save_document(rendered))
+        url = str(self.save_document(rendered))
+        return "%s%s" % (S3_PUBLIC_URL, url[2:-1])
 
     @staticmethod
     def download_template(template_url):
