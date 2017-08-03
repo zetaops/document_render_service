@@ -18,16 +18,18 @@ docker run \
 ```
 
 ## Usage
-Request:
+__Request:__
 ```bash
 # template from url
 curl localhost:3002/v1 -X POST -i -H "Content-Type: application/json" -d '{"template": "http://example.com/sample_template.odt", "context": {"name": "ali"}}'
 
 # base64 encoded template
 curl localhost:3002/v1 -X POST -i -H "Content-Type: application/json" -d "{\"template\": \"`base64 -w 0 template.odt`\", \"context\": {\"name\": \"ali\"}}"
+
 ```
 
-Response:
+
+__Response:__
 ```json
 {"download_url": "http://example.com/sample_rendered.odt"}
 ```
