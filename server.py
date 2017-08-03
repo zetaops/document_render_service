@@ -142,7 +142,7 @@ class GenerateDocument(object):
         k = Key(self.bucket)
         k.set_contents_from_string(rendered)
         self.bucket.set_acl('public-read', k.key)
-        return k.key
+        return k.key.decode("utf-8")
 
     def render_document(self, t_file, context):
         """
